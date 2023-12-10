@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SnapHub.Models;
 
 namespace SnapHub.Data
 {
@@ -9,5 +10,6 @@ namespace SnapHub.Data
             : base(options)
         {
         }
+        public DbSet<SnapHub.Models.Session>? Session { get; set; }
     }
 }

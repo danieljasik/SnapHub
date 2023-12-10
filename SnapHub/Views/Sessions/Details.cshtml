@@ -1,0 +1,47 @@
+﻿@model SnapHub.Models.SessionViewModel
+
+@{
+    ViewData["Title"] = "Sesja";
+}
+
+<h1>Sesja @Html.DisplayNameFor(model => model.PhotoFiles)</h1>
+
+<div>
+    <h4>Session Photos</h4>
+    <div class="row">
+        @foreach (var photoFile in Model.PhotoFiles)
+        {
+            <div class="col-md-3 mb-3">
+                <a href="@Url.Action("ViewPhoto", new { sessionId = Model.Session.Id, photoFile })">
+                    <img src="@Url.Content($"~/uploads/{Model.Session.Id}/{photoFile}")" class="img-thumbnail" alt="Photo">
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal" id="photoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="enlargedPhoto" class="img-fluid" alt="Enlarged Photo">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Obsługa kliknięcia na miniaturę zdjęcia
+        $(document).on("click", ".img-thumbnail", function () {
+            var photoSrc = $(this).attr("src");
+            $("#enlargedPhoto").attr("src", photoSrc);
+            $("#photoModal").modal("show");
+        });
+    </script>
+}

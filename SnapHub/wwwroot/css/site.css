@@ -16,3 +16,16 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+h1 {
+    text-align: center;
+}
+
+.contact-info {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.contact-info p {
+    margin: 10px 0;
+}
