@@ -38,10 +38,11 @@ namespace SnapHub.Controllers
             return View();
         }
 
-        // GET: Sessions/SelectSession/5
-        public async Task<IActionResult> Details(string sessionCode)
+        // GET: Sessions/Details/5
+        public async Task<IActionResult> Details(int id)
         {
-            if (string.IsNullOrWhiteSpace(sessionCode))
+            /*
+            if (string.IsNullOrWhiteSpace(id))
             {
                 return RedirectToAction("Index");
             }
@@ -52,16 +53,16 @@ namespace SnapHub.Controllers
             {
                 return RedirectToAction("Index");
             }
-
+            */
             // Sprawdź, czy sesja istnieje w bazie danych
-            var session = _context.Session.FirstOrDefault(s => s.Id == sessionId && s.CreatedDate == sessionDate.Date);
+            var session = _context.Session.Find(id);
 
             if (session == null)
             {
                 return RedirectToAction("Index");
             }
 
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", sessionId.ToString());
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", id.ToString());
 
             // Sprawdź, czy folder istnieje
             if (Directory.Exists(uploadsFolder))
@@ -102,22 +103,28 @@ namespace SnapHub.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newSession = new Session
-                {
-                    Title = session.Title,
-                    CreatedDate = session.CreatedDate,
-                };
-
                 _context.Add(session);
                 await _context.SaveChangesAsync();
 
-                var sessionId = newSession.Id;
+                var sessionId = session.Id;
+                Console.WriteLine(sessionId);
 
                 var sessionFolder = Path.Combine(_webHostEnvironment.WebRootPath,"uploads", sessionId.ToString());
+
+                Console.WriteLine(sessionFolder);
                 
                 if (!Directory.Exists(sessionFolder))
                 {
                     Directory.CreateDirectory(sessionFolder);
+                }
+
+                if (photos != null && photos.Count > 0)
+                {
+                    Console.WriteLine("Są zdjęcia");
+                }
+                else
+                {
+                    Console.WriteLine("Ni ma zdjęć");
                 }
 
                 foreach (var photoFile in photos)
@@ -125,7 +132,10 @@ namespace SnapHub.Controllers
                     if (photoFile.Length > 0)
                     {
                         var photoFileName = Path.GetFileName(photoFile.FileName);
+                        Console.WriteLine(photoFileName);
                         var photoFilePath = Path.Combine(sessionFolder, photoFileName);
+
+                        Console.WriteLine(photoFilePath);
 
                         using (var fileStream = new FileStream(photoFilePath, FileMode.Create))
                         {
@@ -135,10 +145,13 @@ namespace SnapHub.Controllers
                         // Tworzenie nowego obiektu Photo i przypisanie do sesji
                         var newPhoto = new Photo
                         {
+                            Id = sessionId,
                             FileName = photoFileName,
                             SessionId = sessionId,
                             // Dodaj inne właściwości zdjęcia, które są wymagane
                         };
+
+                        
 
                         // Dodawanie zdjęcia do bazy danych
                     }

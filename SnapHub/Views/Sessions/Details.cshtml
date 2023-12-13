@@ -1,22 +1,30 @@
 ﻿@model SnapHub.Models.SessionViewModel
 
 @{
-    ViewData["Title"] = "Sesja";
+    ViewData["Title"] = "Details";
 }
 
-<h1>Sesja @Html.DisplayNameFor(model => model.PhotoFiles)</h1>
+<h1>Sesja @Html.DisplayFor(model => model.Session.Id)</h1>
 
 <div>
     <h4>Session Photos</h4>
     <div class="row">
-        @foreach (var photoFile in Model.PhotoFiles)
+        @if (Model != null && Model.PhotoFiles != null)
         {
-            <div class="col-md-3 mb-3">
-                <a href="@Url.Action("ViewPhoto", new { sessionId = Model.Session.Id, photoFile })">
-                    <img src="@Url.Content($"~/uploads/{Model.Session.Id}/{photoFile}")" class="img-thumbnail" alt="Photo">
-                </a>
-            </div>
+            @foreach (var photoFile in Model.PhotoFiles)
+            {
+                <div class="col-md-3 mb-3">
+                    <a href="@Url.Action("ViewPhoto", new { sessionId = Model.Session.Id, photoFile })">
+                        <img src="@Url.Content($"~/uploads/{Model.Session.Id}/{photoFile}")" class="img-thumbnail" alt="Photo">
+                    </a>
+                </div>
+            }
         }
+        else
+        {
+            <p>Brak danych do wyświetlenia.</p>
+        }
+        
     </div>
 </div>
 

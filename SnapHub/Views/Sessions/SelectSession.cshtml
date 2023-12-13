@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<SnapHub.Models.Session>
 
 @{
-    ViewData["Title"] = "Sesja";
+    ViewData["Title"] = "Wybierz sesję";
 }
 
 <h1>Sesja</h1>
 <div>
-    <form method="get" action="@Url.Action("Details", "Session")">
+    <form asp-action="Details" asp-route-id="id">
         <div class="form-group">
-            <label for="sessionCode">Enter Session Code:</label>
-            <input type="text" class="form-control" id="sessionCode" name="sessionCode" required />
+            <label for="id">Enter Session Code:</label>
+            <input type="number" class="form-control" id="id" name="id" required />
         </div>
         <button type="submit" class="btn btn-primary">View Session</button>
     </form>
