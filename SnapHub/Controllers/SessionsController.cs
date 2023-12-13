@@ -18,8 +18,9 @@ namespace SnapHub.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ApplicationDbContext _context;
 
-        public SessionsController(ApplicationDbContext context)
+        public SessionsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
+            _webHostEnvironment = webHostEnvironment;
             _context = context;
         }
 
@@ -32,7 +33,12 @@ namespace SnapHub.Controllers
                           Problem("Entity set 'ApplicationDbContext.Session'  is null.");
         }
 
-        // GET: Sessions/Details/5
+        public async Task<IActionResult> SelectSession()
+        {
+            return View();
+        }
+
+        // GET: Sessions/SelectSession/5
         public async Task<IActionResult> Details(string sessionCode)
         {
             if (string.IsNullOrWhiteSpace(sessionCode))
@@ -92,12 +98,53 @@ namespace SnapHub.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Create([Bind("Id,Title,Data,CreatedDate")] Session session)
+        public async Task<IActionResult> Create([Bind("Id,Title,CreatedDate,Photos")] Session session, List<IFormFile> photos)
         {
             if (ModelState.IsValid)
             {
+                var newSession = new Session
+                {
+                    Title = session.Title,
+                    CreatedDate = session.CreatedDate,
+                };
+
                 _context.Add(session);
                 await _context.SaveChangesAsync();
+
+                var sessionId = newSession.Id;
+
+                var sessionFolder = Path.Combine(_webHostEnvironment.WebRootPath,"uploads", sessionId.ToString());
+                
+                if (!Directory.Exists(sessionFolder))
+                {
+                    Directory.CreateDirectory(sessionFolder);
+                }
+
+                foreach (var photoFile in photos)
+                {
+                    if (photoFile.Length > 0)
+                    {
+                        var photoFileName = Path.GetFileName(photoFile.FileName);
+                        var photoFilePath = Path.Combine(sessionFolder, photoFileName);
+
+                        using (var fileStream = new FileStream(photoFilePath, FileMode.Create))
+                        {
+                            await photoFile.CopyToAsync(fileStream);
+                        }
+
+                        // Tworzenie nowego obiektu Photo i przypisanie do sesji
+                        var newPhoto = new Photo
+                        {
+                            FileName = photoFileName,
+                            SessionId = sessionId,
+                            // Dodaj inne właściwości zdjęcia, które są wymagane
+                        };
+
+                        // Dodawanie zdjęcia do bazy danych
+                    }
+                }
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(session);

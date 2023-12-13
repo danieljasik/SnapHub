@@ -6,6 +6,6 @@
         public string FileName { get; set; }
         public DateTime UploadDate { get; set; }
 
-        public string SessionId { get; set; }
+        public int SessionId { get; set; }
     }
 }
