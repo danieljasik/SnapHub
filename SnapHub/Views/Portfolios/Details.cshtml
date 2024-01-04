@@ -1,10 +1,10 @@
-﻿@model SnapHub.Models.SessionViewModel
+﻿@model SnapHub.Models.PortfolioViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Sesja @Html.DisplayFor(model => model.Session.Id)</h1>
+<h1>Sesja @Html.DisplayFor(model => model.Portfolio.Id)</h1>
 
 <div>
     <h4>Session Photos</h4>
@@ -15,7 +15,7 @@
             {
                 <div class="col-md-3 mb-3">
                     <a href="#">
-                        <img src="@Url.Content($"~/uploads/{Model.Session.Id}/{photoFile}")" class="img-thumbnail" alt="Photo">
+                        <img src="@Url.Content($"~/uploads/Portfolio/{photoFile}")" class="img-thumbnail" alt="Photo">
                     </a>
                 </div>
             }
@@ -24,7 +24,7 @@
         {
             <p>Brak danych do wyświetlenia.</p>
         }
-        
+
     </div>
 </div>
 

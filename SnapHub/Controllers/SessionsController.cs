@@ -164,6 +164,7 @@ namespace SnapHub.Controllers
         }
 
         // GET: Sessions/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Session == null)

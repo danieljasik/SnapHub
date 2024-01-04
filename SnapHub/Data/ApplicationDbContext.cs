@@ -11,5 +11,6 @@ namespace SnapHub.Data
         {
         }
         public DbSet<SnapHub.Models.Session>? Session { get; set; }
+        public DbSet<SnapHub.Models.Portfolio>? Portfolio { get; set; }
     }
 }
