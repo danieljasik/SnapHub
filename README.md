@@ -1,29 +1,26 @@
 # SnapHub
-SnapHub
-
-Opis
+## Opis
 
 SnapHub to dynamiczna aplikacja internetowa dla fotografów, umożliwiająca zarządzanie portfolio i sesjami fotograficznymi. Projekt ten oferuje intuicyjny interfejs użytkownika, funkcje zarządzania zawartością i optymalizację pod kątem wydajności.
 
-Funkcje
+## Funkcje
 
-Zarządzanie Portfolio: Tworzenie, edycja i usuwanie portfolio.
-Sesje Fotograficzne: Planowanie i zarządzanie sesjami.
-Współdzielenie Zdjęć: Prezentacja i udostępnianie zdjęć.
-Interakcja Użytkownika: Intuicyjny interfejs i dostosowane widoki.
+- Zarządzanie Portfolio: Tworzenie, edycja i usuwanie portfolio.
+- Sesje Fotograficzne: Planowanie i zarządzanie sesjami.
+- Współdzielenie Zdjęć: Prezentacja i udostępnianie zdjęć.
+- Interakcja Użytkownika: Intuicyjny interfejs i dostosowane widoki.
 
-Technologie
+## Technologie
 
-Backend: .NET
-Frontend: HTML, CSS, JavaScript
-MVC Architecture
+- Backend: .NET
+- Frontend: HTML, CSS, JavaScript
+- MVC Architecture
 
-Instalacja i Użycie
+## Instalacja i Użycie
 
-Instrukcje dotyczące instalacji i uruchamiania projektu.
+## Instrukcje dotyczące instalacji i uruchamiania projektu.
 
 
-Autorzy i Wkład
-
-Daniel Jasik 
+## Autorzy i Wkład
+Daniel Jasik <br>
 Dawid Singpiel
