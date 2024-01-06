@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edycja Portfolio</h1>
 
 <h4>Portfolio</h4>
 <hr />
@@ -15,7 +15,7 @@
             <input type="hidden" asp-for="Id" />
             @if (ViewBag.PhotoFiles != null)
             {
-                <h3>Existing Photos</h3>
+                <h3>Wybierz zdjęcia do usunięcia</h3>
                 <ul>
                     @foreach (var photoFileName in ViewBag.PhotoFiles)
                     {
@@ -27,7 +27,7 @@
                 </ul>
             }
             <div class="form-group">
-                <label asp-for="Photos">Upload Photos:</label>
+                <label asp-for="Photos">Dodaj nowe zdjęcia:</label>
                 <input type="file" name="photos" multiple />
                 <span asp-validation-for="Photos" class="text-danger"></span>
             </div>
@@ -39,7 +39,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Details" asp-route-id="1">Powrót do Portfolio</a>
 </div>
 
 @section Scripts {

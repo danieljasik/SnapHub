@@ -26,7 +26,6 @@
         {
             <p>Brak danych do wyświetlenia.</p>
         }
-
     </div>
 </div>
 
@@ -52,6 +51,9 @@
             var photoSrc = $(this).attr("src");
             $("#enlargedPhoto").attr("src", photoSrc);
             $("#photoModal").modal("show");
+        });
+        $(document).on("click", ".close", function () {
+            $("#photoModal").modal("hide");
         });
     </script>
 }

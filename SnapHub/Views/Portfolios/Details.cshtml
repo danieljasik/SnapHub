@@ -4,10 +4,10 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Sesja @Html.DisplayFor(model => model.Portfolio.Id)</h1>
+<h1>Portfolio</h1>
 
 <div>
-    <h4>Session Photos</h4>
+    <h4>Przykładowe zdjęcia z sesji</h4>
     <div class="row">
         @if (Model != null && Model.PhotoFiles != null)
         {
@@ -50,6 +50,9 @@
             var photoSrc = $(this).attr("src");
             $("#enlargedPhoto").attr("src", photoSrc);
             $("#photoModal").modal("show");
+        });
+        $(document).on("click", ".close", function () {
+            $("#photoModal").modal("hide");
         });
     </script>
 }

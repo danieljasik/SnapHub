@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SnapHub.Data;
+using SnapHub.Data.Migrations;
 using SnapHub.Models;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace SnapHub.Controllers
 {
@@ -167,16 +170,24 @@ namespace SnapHub.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Session == null)
-            {
-                return NotFound();
-            }
 
-            var session = await _context.Session.FindAsync(id);
+            var session = _context.Session.Find(id);
+
+            // Pobierz listę plików z folderu wwwroot/uploads/Portfolio
+            var sessionFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", id.ToString());
+
+            var photoFiles = Directory.GetFiles(sessionFolder)
+                .Select(filePath => Path.GetFileName(filePath))
+                .ToList();
+
+            // Przekazanie listy plików do widoku
+            ViewBag.PhotoFiles = photoFiles;
+
             if (session == null)
             {
                 return NotFound();
             }
+
             return View(session);
         }
 
@@ -186,8 +197,10 @@ namespace SnapHub.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Data,CreatedDate")] Session session)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Data,CreatedDate,Photos")] Session session, List<string> photoFileNames, List<IFormFile> photos)
         {
+            var sessionFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", id.ToString());
+
             if (id != session.Id)
             {
                 return NotFound();
@@ -195,24 +208,75 @@ namespace SnapHub.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                _context.Update(session);
+                await _context.SaveChangesAsync();
+
+                var sessionId = session.Id;
+                //Console.WriteLine(sessionId);
+
+                //Console.WriteLine(sessionFolder);
+
+                if (photos != null && photos.Count > 0)
                 {
-                    _context.Update(session);
-                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Są zdjęcia");
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!SessionExists(session.Id))
+                    Console.WriteLine("Ni ma zdjęć");
+                }
+
+                foreach (var photoFile in photos)
+                {
+                    if (photoFile.Length > 0)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        var photoFileName = Path.GetFileName(photoFile.FileName);
+                        //Console.WriteLine(photoFileName);
+                        var photoFilePath = Path.Combine(sessionFolder, photoFileName);
+
+                        //Console.WriteLine(photoFilePath);
+
+                        using (var fileStream = new FileStream(photoFilePath, FileMode.Create))
+                        {
+                            await photoFile.CopyToAsync(fileStream);
+                        }
+
+                        // Tworzenie nowego obiektu Photo i przypisanie do sesji
+                        var newPhoto = new Photo
+                        {
+                            Id = sessionId,
+                            FileName = photoFileName,
+                            SessionId = sessionId,
+                            // Dodaj inne właściwości zdjęcia, które są wymagane
+                        };
+
+
+
+                        // Dodawanie zdjęcia do bazy danych
                     }
                 }
+                if (photoFileNames != null && photoFileNames.Any())
+                {
+                    foreach (var photoFileName in photoFileNames)
+                    {
+                        var photoToDelete = session.Photos.FirstOrDefault(p => p.FileName == photoFileName);
+
+                        if (photoFileName != null)
+                        {
+                            session.Photos.Remove(photoToDelete);
+                            // Usuń plik z dysku
+                            var filePath = Path.Combine(sessionFolder, photoFileName);
+                            if (System.IO.File.Exists(filePath))
+                            {
+                                System.IO.File.Delete(filePath);
+                            }
+                        }
+                    }
+                }
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(session);
         }
 
@@ -241,6 +305,8 @@ namespace SnapHub.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var sessionFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", id.ToString());
+
             if (_context.Session == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.Session'  is null.");
@@ -250,9 +316,42 @@ namespace SnapHub.Controllers
             {
                 _context.Session.Remove(session);
             }
-            
+
+            string[] files = Directory.GetFiles(sessionFolder);
+            foreach (string file in files)
+            {
+                System.IO.File.SetAttributes(file, FileAttributes.Normal);
+                System.IO.File.Delete(file);
+            }
+
+            if (System.IO.Directory.Exists(sessionFolder))
+            {
+                System.IO.Directory.Delete(sessionFolder);
+            }
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult DownloadAllPhotos(int id)
+        {
+            // Logika pobierania wszystkich zdjęć
+            Console.WriteLine(id.ToString());
+            // Przykładowy kod: Pobierz wszystkie pliki z folderu
+            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", id.ToString());
+            var photoFiles = Directory.GetFiles(folderPath);
+
+            // Tworzenie archiwum ZIP
+            var zipPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "Zdjęcia z sesji.zip");
+            if (System.IO.File.Exists(zipPath))
+            {
+                System.IO.File.Delete(zipPath);
+            }
+            
+            ZipFile.CreateFromDirectory(folderPath, zipPath);
+
+            // Pobierz plik ZIP
+            return PhysicalFile(zipPath, "application/zip", "Zdjęcia z sesji.zip");
         }
 
         private bool SessionExists(int id)
