@@ -25,3 +25,4 @@ Instrukcje dotyczące instalacji i uruchamiania projektu.
 
 Autorzy i Wkład
 Daniel Jasik 
+Dawid Singpiel
